@@ -80,13 +80,11 @@ Database
 Import the provided SQL database file or run Laravel migrations to create the database structure.
 
 Project Developer
-
-Naman Bhah
+Lahnambhah
 
 Internship Project
 NIELIT Shillong
 2026
 
 License
-
 This project is developed for academic and educational purposes.
