@@ -1,90 +1,170 @@
-BanScan Inventory Management and Barcode System
-Overview
+# BanScan Inventory Management and Barcode System
 
-BanScan is a web-based Inventory Management and Barcode System developed to automate inventory operations in retail businesses. The system provides efficient management of products, categories, suppliers, sales transactions, returns, barcode generation, reporting, and dashboard analytics.
+## About BanScan
 
-The project was developed as part of an internship project at NIELIT Shillong using Laravel 12, Livewire 3, MySQL, and Tailwind CSS.
+BanScan is a web-based Inventory Management and Barcode System developed to automate and simplify inventory operations in retail businesses. The system provides an efficient platform for managing products, categories, suppliers, sales transactions, returns, barcode generation, reporting, and dashboard analytics.
 
-Features
-User Management
-Secure Login Authentication
-Email Verification
-Role-Based Access Control (Admin and Cashier)
-Inventory Management
-Category Management
-Item Management
-Supplier Management
-Low Stock Monitoring
-Stock Tracking
-Barcode Module
-Generate Barcode
-Print Barcode
-Barcode-Based Product Identification
-Sales Module
-Create Sales Transactions
-Generate Receipts
-Manual Item Sales Support
-Sales History
-Returns Module
-Process Returns
-Return History
-Automatic Stock Updates
-Reports
-Sales Reports
-Stock Reports
-Dashboard
-Sales Summary
-Profit Summary
-Most Selling Items
-Recently Sold Items
-Low Stock Alerts
-Settings
-Profile Management
-Notification Preferences
-Account Security
-Technologies Used
-Backend
-PHP 8.2
-Laravel 12
-Livewire 3
-Frontend
-HTML5
-Tailwind CSS
-JavaScript
-Database
-MySQL
-Development Tools
-Visual Studio Code
-Composer
-Node.js
-Git & GitHub
-Installation
-Clone Repository
+The application is designed to reduce manual record keeping, improve inventory accuracy, and provide business owners with real-time insights into stock and sales performance.
+
+---
+
+## Features
+
+### User Management
+
+- Secure Login Authentication
+- Email Verification
+- Role-Based Access Control (Admin and Cashier)
+- Profile Management
+- Account Security Settings
+
+### Inventory Management
+
+- Category Management
+- Item Management
+- Supplier Management
+- Stock Monitoring
+- Low Stock Alerts
+- Expiry Date Tracking
+
+### Barcode Module
+
+- Generate Product Barcodes
+- Print Barcodes
+- Barcode-Based Product Identification
+
+### Sales Module
+
+- Create Sales Transactions
+- Generate Sales Receipts
+- Support for Custom Sales Items
+- Sales History Tracking
+
+### Returns Module
+
+- Process Product Returns
+- Return History Management
+- Automatic Stock Adjustment
+
+### Reports and Analytics
+
+- Sales Reports
+- Stock Reports
+- Most Selling Items
+- Recently Sold Items
+- Profit Summary
+- Dashboard Statistics
+
+---
+
+## Technologies Used
+
+BanScan is developed using modern web technologies:
+
+- **Backend:** Laravel 12, Livewire 3, PHP 8.2
+- **Frontend:** HTML5, Tailwind CSS, JavaScript
+- **Database:** MySQL
+- **Development Tools:** Visual Studio Code, Composer, Node.js
+- **Version Control:** Git and GitHub
+
+---
+
+## Installation
+
+### Clone the Repository
+
+```bash
 git clone https://github.com/lahnambhah/BanScan.git
 cd BanScan
-Install Dependencies
+```
+
+### Install Dependencies
+
+```bash
 composer install
 npm install
-Configure Environment
+```
+
+### Configure Environment File
+
+```bash
 cp .env.example .env
 php artisan key:generate
+```
 
-Update database credentials in the .env file.
+Update the database configuration inside the `.env` file.
 
-Run Migrations
+### Run Database Migrations
+
+```bash
 php artisan migrate
-Start Application
+```
+
+### Start the Development Server
+
+```bash
 php artisan serve
-Database
+```
 
-Import the provided SQL database file or run Laravel migrations to create the database structure.
+The application will be available at:
 
+<<<<<<< HEAD
 Project Developer
 Lahnambhah
+=======
+```text
+http://127.0.0.1:8000
+```
 
-Internship Project
-NIELIT Shillong
-2026
+---
+>>>>>>> 649c771 (Updated project README)
 
+## System Modules
+
+<<<<<<< HEAD
 License
 This project is developed for academic and educational purposes.
+=======
+The BanScan system consists of the following modules:
+
+- Dashboard Module
+- Inventory Management Module
+- Barcode Management Module
+- Sales Module
+- Returns Module
+- Report Module
+- Settings Module
+
+---
+
+## Database
+
+The system uses MySQL as its database management system and stores information related to:
+
+- Users
+- Categories
+- Suppliers
+- Items
+- Sales
+- Sale Items
+- Returns
+- Return Items
+
+---
+
+## Project Information
+
+**Project Title:** BanScan Inventory Management and Barcode System
+
+**Developed By:** Lahnambhah Manner
+
+**Organization:** NIELIT Shillong
+
+**Year:** 2026
+
+---
+
+## License
+
+This project was developed for academic and educational purposes as part of an internship project at NIELIT Shillong.
+>>>>>>> 649c771 (Updated project README)
