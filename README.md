@@ -108,20 +108,13 @@ php artisan serve
 
 The application will be available at:
 
-<<<<<<< HEAD
-Project Developer
-Lahnambhah
-=======
 ```text
 http://127.0.0.1:8000
 ```
 
 ---
->>>>>>> 649c771 (Updated project README)
 
 ## System Modules
-
-<<<<<<< HEAD
 License
 This project is developed for academic and educational purposes.
 =======
@@ -167,4 +160,3 @@ The system uses MySQL as its database management system and stores information r
 ## License
 
 This project was developed for academic and educational purposes as part of an internship project at NIELIT Shillong.
->>>>>>> 649c771 (Updated project README)
