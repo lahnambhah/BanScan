@@ -61,6 +61,18 @@
                 </select>
             @endif
 
+            <select
+                wire:model.live="period"
+                class="border px-4 py-2 rounded text-md min-w-[180px]">
+
+                <option value="today">Today</option>
+                <option value="yesterday">Yesterday</option>
+                <option value="this_week">This Week</option>
+                <option value="this_month">This Month</option>
+                <option value="last_month">Last Month</option>
+                <option value="this_year">This Year</option>
+            </select>
+
             <input
                 type="date"
                 wire:model="fromDate"

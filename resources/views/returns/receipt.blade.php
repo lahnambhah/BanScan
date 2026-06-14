@@ -3,158 +3,314 @@
 <head>
     <title>Return Receipt</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+
+        @page{
+            margin:0;
         }
 
-        body {
-            font-family: 'Courier New', monospace;
-            background: white;
-            padding: 0;
+        *{
+            box-sizing:border-box;
+            margin:0;
+            padding:0;
         }
 
-        /* Receipt container – full width, no fixed height */
-        .receipt {
-            width: 100%;
-            background: white;
-            padding: 20px 24px 24px 24px;   /* top, right, bottom, left */
-            border-bottom: 2px dashed #aaa;  /* <-- cut line always at the end */
+        body{
+            font-family:'Courier New', monospace;
+            background:#f5f5f5;
+            padding:10px;
+            color:#111;
         }
 
-        .center {
-            text-align: center;
+        .receipt-page{
+            width:100%;
+            max-width:800px;
+            margin:auto;
+            background:#fff;
+            min-height:100vh;
+            padding:28px 34px;
         }
 
-        .store-name {
-            font-size: 24px;
-            font-weight: bold;
-            letter-spacing: 1px;
+        .center{
+            text-align:center;
         }
 
-        .store-sub {
-            font-size: 11px;
-            color: #666;
-            margin-top: 4px;
+        .store-name{
+            font-size:28px;
+            font-weight:700;
+            letter-spacing:2px;
+            text-transform:uppercase;
         }
 
-        .line {
-            border-top: 1px dashed #999;
-            margin: 14px 0;
+        .store-sub{
+            font-size:11px;
+            color:#777;
+            margin-top:2px;
         }
 
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 8px;
+        .receipt-title{
+            margin-top:8px;
+            font-size:13px;
+            font-weight:700;
+            letter-spacing:1px;
+            color:#dc2626;
         }
 
-        .item-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            margin: 8px 0;
-            padding: 6px 0;
-            border-bottom: 1px solid #eee;
+        .line{
+            border-top:1px dashed #999;
+            margin:12px 0;
         }
 
-        .total {
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-            font-size: 18px;
-            margin-top: 12px;
-            padding-top: 10px;
-            border-top: 2px solid black;
+        .info-grid{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:4px 25px;
+            margin-top:10px;
+            font-size:12px;
         }
 
-        .footer {
-            text-align: center;
-            font-size: 12px;
-            color: #555;
-            margin-top: 20px;
+        .info{
+            display:flex;
+            justify-content:space-between;
+            border-bottom:1px solid #f2f2f2;
+            padding:4px 0;
         }
 
-        /* Print button hidden on screen (optional – we auto‑print anyway) */
-        .print-btn {
-            display: none;
+        .info span:first-child{
+            color:#666;
         }
 
-        @media print {
-            body {
-                background: white;
-                margin: 0;
-                padding: 0;
+        .info span:last-child{
+            font-weight:600;
+        }
+
+        .table-head{
+            display:grid;
+            grid-template-columns:1fr 70px 100px 120px;
+            padding:7px 0;
+            border-bottom:1px solid #ddd;
+            font-size:11px;
+            font-weight:700;
+            color:#777;
+            text-transform:uppercase;
+            letter-spacing:1px;
+        }
+
+        .table-head span:not(:first-child){
+            text-align:right;
+        }
+
+        .item{
+            display:grid;
+            grid-template-columns:1fr 70px 100px 120px;
+            gap:10px;
+            align-items:center;
+            padding:8px 0;
+            border-bottom:1px solid #f3f3f3;
+        }
+
+        .item-name{
+            font-size:13px;
+            font-weight:600;
+            line-height:1.3;
+        }
+
+        .qty,
+        .price,
+        .subtotal{
+            text-align:right;
+            font-size:12px;
+        }
+
+        .subtotal{
+            font-weight:700;
+        }
+
+        .totals{
+            margin-top:10px;
+            margin-left:auto;
+            width:280px;
+        }
+
+        .total-row{
+            display:flex;
+            justify-content:space-between;
+            padding:4px 0;
+            font-size:12px;
+        }
+
+        .grand-total{
+            display:flex;
+            justify-content:space-between;
+            margin-top:6px;
+            padding-top:8px;
+            border-top:2px solid #111;
+            font-size:18px;
+            font-weight:700;
+            color:#dc2626;
+        }
+
+        .footer{
+            margin-top:18px;
+            text-align:center;
+        }
+
+        .thanks{
+            font-size:14px;
+            font-weight:700;
+        }
+
+        .note{
+            margin-top:4px;
+            font-size:10px;
+            color:#888;
+        }
+
+        .print-btn{
+            position:fixed;
+            bottom:20px;
+            right:20px;
+            background:#111;
+            color:#fff;
+            border:none;
+            padding:10px 20px;
+            border-radius:6px;
+            cursor:pointer;
+            font-size:13px;
+        }
+
+        .print-btn:hover{
+            background:#333;
+        }
+
+        @media print{
+
+            body{
+                background:#fff;
+                padding:0;
             }
-            .receipt {
-                border-bottom: 2px dashed black;  /* visible cut line on paper */
-                padding: 16px 20px;
+
+            .receipt-page{
+                max-width:100%;
+                min-height:auto;
+                padding:18px 22px;
+            }
+
+            .print-btn{
+                display:none;
             }
         }
     </style>
 </head>
-<body>
-<div class="receipt">
-    <div class="center">
-        <div class="store-name">BanScan Store</div>
-        <div class="store-sub">Return Receipt</div>
-    </div>
-    <div class="line"></div>
 
-    <div class="info-row">
-        <span>Date:</span>
-        <span>{{ $return->created_at->format('d M Y h:i A') }}</span>
-    </div>
-    <div class="info-row">
-        <span>Customer Phone:</span>
-        <span>{{ $return->customer_phone }}</span>
-    </div>
+<body onload="window.print(); setTimeout(() => window.location.href='/scan', 500);">
 
-    <div class="line"></div>
+    <div class="receipt-page">
+        {{-- HEADER --}}
+        <div class="center">
+            <div class="store-name">
+                BanScan Store
+            </div>
 
-    @foreach($return->items as $item)
-        <div class="item-row">
-            <span>
-                {{
-                    $item->saleItem->is_custom
-                        ? $item->saleItem->custom_name
-                        : ($item->item->name ?? 'Deleted Item')
-                }}
-                x {{ $item->quantity }}
-            </span>
+            <div class="store-sub">
+                Smart Inventory & POS System
+            </div>
 
-            <span>
-                ₹ {{ number_format($item->price * $item->quantity, 2) }}
-            </span>
+            <div class="receipt-title">
+                RETURN RECEIPT
+            </div>
         </div>
-    @endforeach
 
-    <div class="line"></div>
+        <div class="line"></div>
 
-    <div class="total">
-        <span>Total Refund</span>
-        <span>₹ {{ number_format($return->total, 2) }}</span>
+        {{-- INFO --}}
+        <div class="info-grid">
+            <div class="info">
+                <span>Date</span>
+                <span>{{ $return->created_at->format('d M Y') }}</span>
+            </div>
+
+            <div class="info">
+                <span>Time</span>
+                <span>{{ $return->created_at->format('h:i A') }}</span>
+            </div>
+
+            <div class="info">
+                <span>Phone</span>
+                <span>{{ $return->customer_phone }}</span>
+            </div>
+
+            <div class="info">
+                <span>Return No.</span>
+                <span>#{{ $return->id }}</span>
+            </div>
+        </div>
+
+        <div class="line"></div>
+
+        {{-- TABLE HEAD --}}
+        <div class="table-head">
+            <span>Item</span>
+            <span>Qty</span>
+            <span>Price</span>
+            <span>Refund</span>
+        </div>
+
+        {{-- ITEMS --}}
+        @foreach($return->items as $item)
+            <div class="item">
+                <div class="item-name">
+                    {{
+                        $item->saleItem->is_custom
+                            ? $item->saleItem->custom_name
+                            : ($item->item->name ?? 'Deleted Item')
+                    }}
+                </div>
+
+                <div class="qty">
+                    {{ $item->quantity }}
+                </div>
+
+                <div class="price">
+                    ₹{{ number_format($item->price, 2) }}
+                </div>
+
+                <div class="subtotal">
+                    ₹{{ number_format($item->quantity * $item->price, 2) }}
+                </div>
+            </div>
+        @endforeach
+
+        {{-- TOTALS --}}
+        <div class="totals">
+            <div class="total-row">
+                <span>Total Refund</span>
+                <span>₹{{ number_format($return->total, 2) }}</span>
+            </div>
+
+            <div class="grand-total">
+                <span>REFUND</span>
+                <span>₹{{ number_format($return->total, 2) }}</span>
+            </div>
+        </div>
+
+        <div class="line"></div>
+
+        {{-- FOOTER --}}
+        <div class="footer">
+            <div class="thanks">
+                Return Processed Successfully
+            </div>
+
+            <div class="note">
+                Please keep this receipt for future reference
+            </div>
+        </div>
     </div>
 
-    <div class="footer">
-        Thank you · Keep this receipt
-    </div>
-    <!-- The dashed cut line appears right after this footer, thanks to border-bottom on .receipt -->
-</div>
+    <button class="print-btn" onclick="window.print()">
+        🖨 Print
+    </button>
 
-<script>
-    // Automatically open print dialog when page loads
-    window.onload = function() {
-        window.print();
-    };
-
-    // After printing (or cancelling), redirect back to scan page
-    window.onafterprint = function() {
-        window.location.href = '/scan';
-    };
-</script>
 </body>
+
 </html>

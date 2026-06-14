@@ -16,12 +16,22 @@
     </div>
 
     {{-- SEARCH --}}
-    <div>
+    <div class="relative w-full md:w-96">
         <input
+            wire:key="search-{{ md5($search) }}"
             type="text"
-            wire:model.live="search"
+            wire:model.live.debounce.1000ms="search"
             placeholder="Search categories..."
-            class="w-full md:w-96 border rounded px-4 py-2 focus:ring-2 focus:ring-blue-500">
+            class="w-full border rounded px-4 py-2 pr-10 focus:ring-2 focus:ring-blue-500">
+
+        @if($search)
+            <button
+                type="button"
+                wire:click="clearSearch"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500">
+                <x-heroicon-o-x-mark class="w-5 h-5"/>
+            </button>
+        @endif
     </div>
 
     {{-- SUCCESS --}}
@@ -91,8 +101,7 @@
                                 </a>
 
                                 <button
-                                    onclick="confirm('Delete this category?') || event.stopImmediatePropagation()"
-                                    wire:click="delete({{ $category->id }})"
+                                    onclick="confirmDelete({{ $category->id }})"
                                     class="text-gray-400 hover:text-red-500 transition">
                                     <x-heroicon-o-trash class="w-5 h-5" />
                                 </button>
@@ -145,8 +154,7 @@
                 </a>
 
                 <button
-                    onclick="confirm('Delete this category?') || event.stopImmediatePropagation()"
-                    wire:click="delete({{ $category->id }})"
+                    onclick="confirmDelete({{ $category->id }})"
                     class="text-gray-400 hover:text-red-500">
                     <x-heroicon-o-trash class="w-5 h-5" />
                 </button>
@@ -166,4 +174,54 @@
     <div class="mt-4">
         {{ $categories->links() }}
     </div>
+
+    <script>
+        function confirmDelete(id) {
+
+            Swal.fire({
+                title: 'Delete Category?',
+                text: 'This action cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, Delete',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+                    Livewire.dispatch('deleteCategory', {
+                        id: id
+                    });
+
+                }
+
+            });
+
+        }
+
+        window.addEventListener('categoryDeleted', event => {
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Deleted',
+                text: event.detail.message,
+                timer: 2000,
+                showConfirmButton: false
+            });
+
+        });
+    </script>
+    <script>
+        window.addEventListener('categoryError', event => {
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Cannot Delete',
+                text: event.detail.message
+            });
+
+        });
+    </script>
 </div>

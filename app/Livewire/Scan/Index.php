@@ -204,6 +204,38 @@ class Index extends Component
         }
     }
 
+    // UPDATE QTY
+    public function updateQty($code, $qty)
+    {
+        if (!isset($this->cart[$code])) {
+            return;
+        }
+
+        $qty = (int) $qty;
+
+        if ($qty < 1) {
+            $qty = 1;
+        }
+
+        // Custom item
+        if (isset($this->cart[$code]['manual'])) {
+            $this->cart[$code]['qty'] = $qty;
+            return;
+        }
+
+        $item = Item::find($this->cart[$code]['id']);
+
+        if (!$item) {
+            return;
+        }
+
+        if ($qty > $item->stock) {
+            $qty = $item->stock;
+        }
+
+        $this->cart[$code]['qty'] = $qty;
+    }
+
     // REMOVE
     public function remove($code)
     {

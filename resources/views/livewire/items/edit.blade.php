@@ -51,6 +51,9 @@
                     wire:model="manufactured_at"
                     class="w-full border rounded-lg px-4 py-2">
             </div>
+            @error('manufactured_at') 
+                <span class="text-red-500 text-sm">{{ $message }}</span>
+            @enderror
 
             <div>
                 <label class="block mb-2 font-medium">Expiry Date</label>
@@ -58,6 +61,9 @@
                     wire:model="expiry_date"
                     class="w-full border rounded-lg px-4 py-2">
             </div>
+            @error('expiry_date') 
+                <span class="text-red-500 text-sm">{{ $message }}</span>
+            @enderror
         </div>
 
         {{-- Quantity --}}
@@ -75,7 +81,7 @@
 
             <div class="border rounded-lg px-4 py-3 bg-gray-50">
                 <span class="text-gray-700 text-sm">
-                {{ $item->barcode ?? 'N/A' }}
+                {{ $barcode ?? 'N/A' }}
                 </span>
             </div>
 
@@ -84,6 +90,19 @@
             </p>
         </div>
 
+        {{-- Low Stock Alert --}}
+        <div>
+            <label class="block mb-1 font-medium">Low Stock Alert</label>
+
+            <input
+                type="number"
+                wire:model="low_stock_limit"
+                class="w-full border rounded-lg px-4 py-2">
+
+            @error('low_stock_limit')
+                <span class="text-red-500 text-sm">{{ $message }}</span>
+            @enderror
+        </div>
         {{-- Price --}}
         <div>
             <label class="block mb-1 font-medium">Price</label>
@@ -100,7 +119,12 @@
             </a>
 
             <button wire:click="update" class="bg-gray-800 text-white px-6 py-2 rounded hover:bg-gray-700 w-full sm:w-auto">  
-                Update Item
+                <span wire:loading.remove wire:target="update">
+                    Update Item
+                </span>
+                <span wire:loading wire:target="update">
+                    Saving...
+                </span>
             </button>
         </div>
     </div>

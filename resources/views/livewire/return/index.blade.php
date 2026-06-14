@@ -1,10 +1,8 @@
 <div class="max-w-7xl mx-auto space-y-6">
-
     {{-- HEADER --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
             <h1 class="text-2xl sm:text-3xl font-bold">Return Items</h1>
-
             <p class="text-gray-500 text-sm sm:text-base">
                 Process returned products using receipt numbers
             </p>
@@ -13,13 +11,25 @@
 
     {{-- SEARCH RECEIPT --}}
     <div class="bg-white rounded-2xl shadow p-4 sm:p-5">
-
         <div class="flex flex-col sm:flex-row gap-3">
+            <div class="relative flex-1">
+                <input
+                    wire:key="receipt-search-{{ md5($receiptNo) }}"
+                    type="text"
+                    wire:model.live="receiptNo"
+                    placeholder="Enter Receipt No..."
+                    class="w-full border rounded px-4 py-3 pr-10 focus:ring-2 focus:ring-blue-500 focus:outline-none">
 
-            <input type="text"
-                wire:model="filterReceipt"
-                placeholder="Enter Receipt No..."
-                class="w-full border rounded px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                @if($receiptNo)
+                    <button
+                        type="button"
+                        wire:click="clearReceiptSearch"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500">
+                        <x-heroicon-o-x-mark class="w-5 h-5" />
+                    </button>
+                @endif
+            </div>
+            
             @error('filterReceipt')
                 <p class="text-red-500 text-sm mt-2">
                     {{ $message }}
@@ -31,6 +41,14 @@
                 class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded whitespace-nowrap font-medium">
                 Load Sales
             </button>
+            <div
+                wire:loading.flex
+                wire:target="loadSales"
+                class="fixed inset-0 z-[99999] items-center justify-center bg-black/10 backdrop-blur-sm">
+                <img
+                    src="{{ asset('images/loading.png') }}"
+                    class="h-8 w-auto animate-pulse">
+            </div>
         </div>
     </div>
 
@@ -53,9 +71,7 @@
 
         {{-- PURCHASED ITEMS --}}
         <div class="bg-white rounded-2xl shadow p-4 sm:p-5">
-
             <div class="flex items-center justify-between mb-5">
-
                 <div>
                     <h2 class="text-lg font-bold">
                         Purchased Items
@@ -72,15 +88,11 @@
             </div>
 
             <div class="space-y-4 max-h-[650px] overflow-y-auto pr-1">
-
                 @forelse($salesItems as $item)
-
                 <div class="border rounded-2xl p-4 hover:border-blue-400 transition">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-
                         {{-- LEFT --}}
                         <div class="min-w-0 flex-1">
-
                             <h3 class="font-semibold text-base break-words">
                                 {{ $item['name'] }}
                             </h3>
@@ -91,7 +103,6 @@
 
                             {{-- STATS --}}
                             <div class="flex flex-wrap gap-2 mt-3 text-xs">
-
                                 <span class="bg-gray-100 px-2 py-1 rounded-full">
                                     Sold: {{ $item['sold_qty'] }}
                                 </span>
@@ -112,7 +123,6 @@
                             class="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded text-sm whitespace-nowrap
                             {{ $item['remaining_qty'] <= 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
                             {{ $item['remaining_qty'] <= 0 ? 'disabled' : '' }}>
-
                             + Add Return
                         </button>
                     </div>
@@ -124,16 +134,13 @@
                     <x-heroicon-o-arrow-uturn-left class="w-14 h-14 mx-auto mb-3 opacity-30" />
                     <p>No sales loaded</p>
                 </div>
-
                 @endforelse
             </div>
         </div>
 
         {{-- RETURN CART --}}
         <div class="bg-white rounded-2xl shadow p-4 sm:p-5">
-
             <div class="flex items-center justify-between mb-5">
-
                 <div>
                     <h2 class="text-lg font-bold">
                         Return Cart
@@ -150,9 +157,7 @@
             </div>
 
             <div class="space-y-4 max-h-[650px] overflow-y-auto pr-1">
-
                 @forelse($cart as $item)
-
                 <div class="border rounded-2xl p-4">
                     <div class="space-y-4">
                         {{-- INFO --}}
@@ -168,7 +173,6 @@
 
                         {{-- CONTROLS --}}
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-
                             {{-- PRICE --}}
                             <div>
                                 <p class="text-xs text-gray-400">
@@ -182,7 +186,6 @@
 
                             {{-- QTY --}}
                             <div class="flex items-center gap-3">
-
                                 <button
                                     wire:click="decrease('{{ $item['sale_item_id'] }}')"
                                     class="w-10 h-10 rounded bg-gray-100 hover:bg-gray-200 text-lg">
@@ -244,10 +247,8 @@
 
     {{-- RETURN HISTORY --}}
     <div class="bg-white rounded-2xl shadow p-4 sm:p-5">
-
         {{-- HEADER --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
-
             <div>
                 <h2 class="text-lg font-bold">
                     Return History
@@ -261,15 +262,39 @@
 
         {{-- FILTERS --}}
         <div class="flex flex-col sm:flex-row gap-3 mb-5">
+            <div class="relative flex-1">
+                <input
+                    wire:key="history-search-{{ md5($historyReceipt) }}"
+                    type="text"
+                    wire:model.live.debounce.1000ms="historyReceipt"
+                    placeholder="Search Receipt No..."
+                    class="w-full border rounded px-4 py-3 pr-10 text-sm">
 
-            <input type="text"
-                wire:model.lazy="filterReceipt"
-                placeholder="Search Receipt No..."
-                class="w-full border rounded px-4 py-3 text-sm">
+                @if($historyReceipt)
+                    <button
+                        type="button"
+                        wire:click="clearHistorySearch"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500">
+                        <x-heroicon-o-x-mark class="w-5 h-5" />
+                    </button>
+                @endif
+            </div>
 
-            <input type="date"
-                wire:model.lazy="filterDate"
-                class="w-full border rounded px-4 py-3 text-sm">
+            <div class="relative">
+                <input
+                    type="date"
+                    wire:model.live.debounce.1000ms="filterDate"
+                    class="w-full border rounded px-4 py-3 pr-10 text-sm">
+
+                @if($filterDate)
+                    <button
+                        type="button"
+                        wire:click="clearDateFilter"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500">
+                        <x-heroicon-o-x-mark class="w-5 h-5" />
+                    </button>
+                @endif
+            </div>
 
             <button
                 wire:click="loadReturns"
@@ -297,7 +322,7 @@
                     @forelse($returnHistory as $return)
                     <tr class="border-b hover:bg-gray-50">
                         <td class="py-4">
-                            {{ $return->created_at->format('d M Y') }}
+                            {{ $return->created_at->format('d M Y h:i A') }}
                         </td>
 
                         <td>
@@ -340,56 +365,114 @@
 
         {{-- MOBILE CARDS --}}
         <div class="md:hidden space-y-4">
-
             @forelse($returnHistory as $return)
+                <div class="border rounded-2xl p-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <p class="font-semibold">
+                                ₹{{ number_format($return->total) }}
+                            </p>
 
-            <div class="border rounded-2xl p-4">
-                <div class="flex items-start justify-between gap-3">
-                    <div>
-                        <p class="font-semibold">
-                            ₹{{ number_format($return->total) }}
-                        </p>
+                            <p class="text-xs text-gray-500 mt-1">
+                                {{ $return->created_at->format('d M Y h:i A') }}
+                            </p>
+                        </div>
 
-                        <p class="text-xs text-gray-500 mt-1">
-                            {{ $return->created_at->format('d M Y') }}
-                        </p>
+                        <div class="bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs">
+                            {{ $return->items->count() }} items
+                        </div>
                     </div>
 
-                    <div class="bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs">
-                        {{ $return->items->count() }} items
+                    <div class="mt-4 space-y-2 text-sm">
+                        <div>
+                            <span class="text-gray-400">Phone:</span>
+                            {{ $return->customer_phone }}
+                        </div>
+
+                        <div>
+                            <span class="text-gray-400">Receipt:</span>
+
+                            {{ optional(optional(optional($return->items->first())->saleItem)->sale)->receipt_no }}
+                        </div>
                     </div>
+
+                    <a href="{{ route('return.receipt', $return->id) }}"
+                        class="mt-4 w-full bg-gray-800 text-white py-3 rounded flex items-center justify-center text-sm">
+                        View Receipt
+                    </a>
                 </div>
-
-                <div class="mt-4 space-y-2 text-sm">
-                    <div>
-                        <span class="text-gray-400">Phone:</span>
-                        {{ $return->customer_phone }}
-                    </div>
-
-                    <div>
-                        <span class="text-gray-400">Receipt:</span>
-
-                        {{ optional(optional(optional($return->items->first())->saleItem)->sale)->receipt_no }}
-                    </div>
-                </div>
-
-                <a href="{{ route('return.receipt', $return->id) }}"
-                    class="mt-4 w-full bg-gray-800 text-white py-3 rounded flex items-center justify-center text-sm">
-                    View Receipt
-                </a>
-            </div>
-
             @empty
-
-            <div class="text-center py-10 text-gray-400">
-                No return history
-            </div>
-
+                <div class="text-center py-10 text-gray-400">
+                    No return history
+                </div>
             @endforelse
-
         </div>
+
         <div class="mt-4">
             {{ $returnHistory->links() }}
         </div>
     </div>
 </div>
+
+@if($showReturnSuccess)
+    <div class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/30">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-md text-center">
+            <div class="text-green-600 text-5xl mb-4">
+                ✓
+            </div>
+
+            <h2 class="text-2xl font-bold mb-2">
+                Return Completed
+            </h2>
+
+            <p class="text-gray-500 mb-6">
+                Return processed successfully.
+            </p>
+
+            <div class="flex gap-3">
+                <button
+                    onclick="window.open('{{ route('return.receipt', $lastReturnId) }}','_blank')"
+                    class="flex-1 bg-gray-800 text-white py-3 rounded">
+                    Print Receipt
+                </button>
+
+                <button
+                    wire:click="$set('showReturnSuccess', false)"
+                    class="flex-1 border py-3 rounded">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+@endif
+
+{{-- Return Success Script --}}
+<script>
+window.addEventListener('returnSuccess', event => {
+
+    Swal.fire({
+        icon: 'success',
+        title: 'Return Completed',
+        text: 'Return processed successfully.',
+        showCancelButton: true,
+        confirmButtonText: 'Print Receipt',
+        cancelButtonText: 'Close',
+        confirmButtonColor: '#1f2937'
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+
+            window.open(
+                event.detail.receiptUrl,
+                '_blank'
+            );
+
+        }
+
+        // Refresh page after either button
+        Livewire.navigate(window.location.pathname);
+
+    });
+
+});
+</script>

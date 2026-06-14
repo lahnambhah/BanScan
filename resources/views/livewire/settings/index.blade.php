@@ -92,6 +92,14 @@
                         class="w-full bg-gray-800 hover:bg-gray-900 text-white py-3 rounded transition">
                         Save Changes
                     </button>
+                    <div
+                        wire:loading.flex
+                        wire:target="save"
+                        class="fixed inset-0 z-[99999] items-center justify-center bg-black/10 backdrop-blur-sm">
+                        <img
+                            src="{{ asset('images/loading.png') }}"
+                            class="h-8 w-auto animate-pulse">
+                    </div>
                 </div>
             </div>
         </div>
@@ -290,7 +298,7 @@
                 });
 
             });
-            // Success alert for saved changes
+            // Success alert
             Livewire.on('saved', () => {
                 Swal.fire({
                     icon: 'success',
@@ -300,6 +308,17 @@
                     timer: 1500,
                     background: '#fff',
                     backdrop: 'rgba(0,0,0,0.2)'
+                });
+            });
+
+            // No changes alert
+            Livewire.on('noChanges', () => {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'No Changes',
+                    text: 'Please make changes before saving.',
+                    showConfirmButton: false,
+                    timer: 1800
                 });
             });
 

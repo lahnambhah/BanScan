@@ -30,7 +30,7 @@
         {{-- EMAIL --}}
         <div>
             <label class="block mb-2 font-medium">
-                Email Address *
+                Email Address 
             </label>
             <input
                 type="email"
@@ -81,7 +81,12 @@
             <button
                 wire:click="save"
                 class="bg-gray-800 text-white px-6 py-2 rounded hover:bg-gray-900 transition w-full sm:w-auto">
-                Save Supplier
+                <span wire:loading.remove wire:target="save">
+                    Create Supplier
+                </span>
+                <span wire:loading wire:target="save">
+                    Saving...   
+                </span>
             </button>
         </div>
 

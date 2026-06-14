@@ -42,7 +42,12 @@
             <button
                 wire:click="save"
                 class="bg-gray-800 text-white px-6 py-2 rounded cursor-pointer w-full sm:w-auto">
-                Save Category
+                <span wire:loading.remove wire:target="save">
+                    Create Category
+                </span>
+                <span wire:loading wire:target="save">
+                    Saving...
+                </span>
             </button>
         </div>
     </div>

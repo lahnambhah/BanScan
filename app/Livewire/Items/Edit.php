@@ -22,7 +22,7 @@ class Edit extends Component
     public $manufactured_at;
     public $expiry_date;
     public $low_stock_limit;
-
+    public $barcode;
     public function mount($id)
     {
         $item = Item::findOrFail($id);
@@ -36,6 +36,7 @@ class Edit extends Component
         $this->manufactured_at = $item->manufactured_at;
         $this->expiry_date = $item->expiry_date;
         $this->low_stock_limit = $item->low_stock_limit;
+        $this->barcode = $item->barcode;
     }
 
     public function update()
@@ -46,8 +47,8 @@ class Edit extends Component
             'supplier_id' => 'required',
             'stock' => 'required|numeric|min:0',
             'price' => 'required|numeric|min:1',
-            'manufactured_at' => 'required|date',
-            'expiry_date' => 'required|date|after_or_equal:manufactured_at',
+            'manufactured_at' => 'nullable|date|before_or_equal:today',
+            'expiry_date' => 'nullable|date|after:manufactured_at',
             'low_stock_limit' => 'required|integer|min:1',
         ], [
 

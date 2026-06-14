@@ -21,22 +21,38 @@ class BarcodeController extends Controller
 
     public function export(Request $request)
     {
+        $items = collect();
+
+        // NEW LIVEWIRE VERSION
+        if ($request->filled('ids')) {
+
+            $ids = explode(',', $request->ids);
+
+            $items = Item::whereIn('id', $ids)->get();
+
+            return view('barcodes.export-a4', compact('items'));
+        }
+
+        // OLD JS VERSION
         $data = json_decode($request->items, true);
 
-        $items = collect();
+        if (!$data) {
+            return back();
+        }
 
         foreach ($data as $entry) {
 
             $item = Item::find($entry['id']);
 
-            if (!$item) continue;
+            if (!$item) {
+                continue;
+            }
 
-            for ($i = 0; $i < $entry['qty']; $i++) {
+            for ($i = 0; $i < ($entry['qty'] ?? 1); $i++) {
 
                 $items->push($item);
 
             }
-
         }
 
         return view('barcodes.export-a4', compact('items'));

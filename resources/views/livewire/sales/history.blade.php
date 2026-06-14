@@ -15,10 +15,23 @@
 
         {{-- RESPONSIVE SEARCH --}}
         <div class="flex flex-col sm:flex-row gap-4">
-            <input type="text"
-                wire:model.live="search"
-                placeholder="Enter Receipt No..."
-                class="border rounded px-4 py-3 w-full sm:w-72">
+            <div class="relative w-full sm:w-72">
+                <input
+                    wire:key="sales-search-{{ md5($search) }}"
+                    type="text"
+                    wire:model.live.debounce.1000ms="search"
+                    placeholder="Enter Receipt No..."
+                    class="w-full border rounded px-4 py-3 pr-10">
+
+                @if($search)
+                    <button
+                        type="button"
+                        wire:click="clearSearch"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500">
+                        <x-heroicon-o-x-mark class="w-5 h-5"/>
+                    </button>
+                @endif
+            </div>
 
             {{-- DATE FILTERS --}}
             <div class="flex flex-col gap-2">
@@ -111,7 +124,6 @@
                             No sales found
                         </td>
                     </tr>
-
                     @endforelse
                 </tbody>
             </table>
@@ -120,60 +132,53 @@
 
     {{-- MOBILE CARDS --}}
     <div class="md:hidden space-y-4">
-
         @forelse($sales as $sale)
+            <div class="bg-white rounded-2xl shadow p-4 border">
+                {{-- TOP --}}
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <h2 class="font-bold text-sm break-all">
+                            {{ $sale->receipt_no }}
+                        </h2>
 
-        <div class="bg-white rounded-2xl shadow p-4 border">
+                        <p class="text-gray-500 text-xs mt-1">
+                            {{ $sale->created_at->format('d M Y h:i A') }}
+                        </p>
+                    </div>
 
-            {{-- TOP --}}
-            <div class="flex items-start justify-between gap-3">
-                <div class="min-w-0">
-                    <h2 class="font-bold text-sm break-all">
-                        {{ $sale->receipt_no }}
-                    </h2>
-
-                    <p class="text-gray-500 text-xs mt-1">
-                        {{ $sale->created_at->format('d M Y h:i A') }}
-                    </p>
+                    <div class="text-right">
+                        <p class="font-bold text-base">
+                            ₹{{ number_format($sale->total) }}
+                        </p>
+                    </div>
                 </div>
 
-                <div class="text-right">
-                    <p class="font-bold text-base">
-                        ₹{{ number_format($sale->total) }}
-                    </p>
+                {{-- DETAILS --}}
+                <div class="mt-4 grid grid-cols-1 gap-3 text-sm">
+                    <div>
+                        <p class="text-gray-400 text-xs">
+                            Customer Phone
+                        </p>
+
+                        <p class="font-medium">
+                            {{ $sale->customer_phone }}
+                        </p>
+                    </div>
+                </div>
+
+                {{-- ACTION --}}
+                <div class="mt-5 pt-4 border-t">
+                    <a href="{{ route('receipt.print', $sale->id) }}"
+                        target="_blank"
+                        class="w-full bg-gray-800 text-white py-3 rounded text-sm flex items-center justify-center">
+                        Print Receipt
+                    </a>
                 </div>
             </div>
-
-            {{-- DETAILS --}}
-            <div class="mt-4 grid grid-cols-1 gap-3 text-sm">
-                <div>
-                    <p class="text-gray-400 text-xs">
-                        Customer Phone
-                    </p>
-
-                    <p class="font-medium">
-                        {{ $sale->customer_phone }}
-                    </p>
-                </div>
-            </div>
-
-            {{-- ACTION --}}
-            <div class="mt-5 pt-4 border-t">
-
-                <a href="{{ route('receipt.print', $sale->id) }}"
-                    target="_blank"
-                    class="w-full bg-gray-800 text-white py-3 rounded text-sm flex items-center justify-center">
-                    Print Receipt
-                </a>
-            </div>
-        </div>
-
         @empty
-
-        <div class="bg-white rounded-xl shadow p-6 text-center text-gray-500">
-            No sales found
-        </div>
-
+            <div class="bg-white rounded-xl shadow p-6 text-center text-gray-500">
+                No sales found
+            </div>
         @endforelse
     </div>
 

@@ -8,6 +8,7 @@
     <title>BanScan</title>
 
     @vite(['resources/css/app.css','resources/js/app.js'])
+    <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
     @livewireStyles
 </head>
 
@@ -140,9 +141,16 @@
                 </div>
             </div>
 
-            <a href="/settings" class="w-full border rounded-lg py-2 text-sm hover:bg-gray-100 flex items-center justify-center gap-2">
-                <x-heroicon-o-arrow-right-on-rectangle class="w-4 h-4"/>Sign Out
-            </a>
+            <form id="sidebarLogoutForm" method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button
+                    type="button"
+                    onclick="confirmSidebarLogout()"
+                    class="w-full border rounded-lg py-2 text-sm hover:bg-gray-100 flex items-center justify-center gap-2">
+                    <x-heroicon-o-arrow-right-on-rectangle class="w-4 h-4"/>
+                    Sign Out
+                </button>
+            </form>
         </div>
     </aside>
 
@@ -176,6 +184,7 @@
         <main class="p-4 sm:p-6 lg:p-8">
             {{ $slot }}
         </main>
+
     </div>
 </div>
 
@@ -190,9 +199,75 @@ function toggleSidebar() {
 
     sidebar.classList.toggle('-translate-x-full');
     overlay.classList.toggle('hidden');
+    
 }
 </script>
 
+{{-- PAGE LOADER SCRIPT --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const loader = document.getElementById('pageLoader');
+
+    document.querySelectorAll('a').forEach(link => {
+
+        link.addEventListener('click', function () {
+
+            if (
+                this.href &&
+                !this.href.includes('#') &&
+                !this.target
+            ) {
+                setTimeout(() => {
+                    loader.classList.remove('hidden');
+                    loader.classList.add('flex');
+                }, 300);
+            }
+
+        });
+
+    });
+
+});
+</script>
+
+{{-- LOGOUT CONFIRMATION SCRIPT --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function confirmSidebarLogout()
+{
+    Swal.fire({
+        title: 'Sign Out?',
+        text: 'Are you sure you want to sign out?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, Sign Out',
+        cancelButtonText: 'Cancel',
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+            document.getElementById('sidebarLogoutForm').submit();
+        }
+
+    });
+}
+</script>
 <script src="https://unpkg.com/html5-qrcode"></script>
+
+{{-- PAGE LOADER --}}
+<div id="pageLoader"
+    class="fixed inset-0 z-[99999] hidden items-center justify-center
+           bg-black/10 backdrop-blur-sm">
+    <div class="flex flex-col items-center gap-3">
+        <img
+            src="{{ asset('images/loading.png') }}"
+            class="h-8 w-auto animate-pulse">
+    </div>
+</div>
+
+{{-- TOM SELECT --}}
+<script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 </body>
 </html>

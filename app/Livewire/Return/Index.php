@@ -9,22 +9,25 @@ use App\Models\ReturnModel;
 use App\Models\ReturnItem;
 use Livewire\Attributes\Layout;
 use Livewire\WithPagination;
+use Illuminate\Support\Str;
 
 #[Layout('layouts.app')]
 class Index extends Component
 {
     use WithPagination;
     public $receiptNo;
+    public $historyReceipt='';
     public $salesItems = [];
     public $cart = [];
     public $filterReceipt = '';
     public $filterDate = [];
-
+    public $lastReturnId = null;
+    public $showReturnSuccess = false;
 
     // LOAD SALES
     public function loadSales()
     {
-        $sales = Sale::where('receipt_no', $this->filterReceipt)
+        $sales = Sale::where('receipt_no', $this->receiptNo)
             ->with('items.item')
             ->get();
 
@@ -53,9 +56,7 @@ class Index extends Component
                 $this->salesItems[] = [
 
                     'id' => $saleItem->item_id,
-
                     'sale_item_id' => $saleItem->id,
-
                     'name' => $saleItem->is_custom
                         ? $saleItem->custom_name
                         : ($saleItem->item->name ?? 'Deleted Item'),
@@ -65,13 +66,9 @@ class Index extends Component
                         : ($saleItem->item->barcode ?? 'N/A'),
 
                     'price' => $saleItem->price,
-
                     'sold_qty' => $saleItem->quantity,
-
                     'returned_qty' => $returnedQty,
-
                     'remaining_qty' => $remaining,
-
                     'is_custom' => $saleItem->is_custom,
                 ];
             }
@@ -89,9 +86,7 @@ class Index extends Component
         }
 
         $cartKey = $saleItem['sale_item_id'];
-
         $currentQty = $this->cart[$cartKey]['qty'] ?? 0;
-
         $returnedQty = ReturnItem::where(
             'sale_item_id',
             $saleItem['sale_item_id']
@@ -103,11 +98,8 @@ class Index extends Component
         }
 
         if (isset($this->cart[$cartKey])) {
-
             $this->cart[$cartKey]['qty']++;
-
         } else {
-
             $this->cart[$cartKey] = [
                 'id' => $saleItem['id'],
                 'sale_item_id' => $saleItem['sale_item_id'],
@@ -128,7 +120,6 @@ class Index extends Component
         }
 
         $item = $this->cart[$key];
-
         $returnedQty = ReturnItem::where(
             'sale_item_id',
             $item['sale_item_id']
@@ -141,15 +132,12 @@ class Index extends Component
             )['sold_qty'] ?? 0;
 
         if (($returnedQty + $item['qty'] + 1) > $soldQty) {
-
             session()->flash(
                 'error',
                 'Max return reached'
             );
-
             return;
         }
-
         $this->cart[$key]['qty']++;
     }
 
@@ -158,11 +146,14 @@ class Index extends Component
         if (!isset($this->cart[$key])) {
             return;
         }
-
-        if ($this->cart[$key]['qty'] > 1) {
-            $this->cart[$key]['qty']--;
+        if ($this->cart[$key]['qty'] == 1) {
+            session()->flash(
+                'error',
+                'Minimum quantity is 1. Remove item to delete from cart.'
+            );
+            return;
         }
-        session()->flash('error', 'Minimum quantity is 1. Remove item to delete from cart.');
+        $this->cart[$key]['qty']--;
     }
 
     public function remove($id)
@@ -186,7 +177,8 @@ class Index extends Component
         }
 
         $return = ReturnModel::create([
-            'customer_phone' => Sale::where('receipt_no', $this->filterReceipt)->first()?->customer_phone,
+            'return_no' => 'RTN-' . strtoupper(Str::random(8)),
+            'customer_phone' => Sale::where('receipt_no', $this->receiptNo)->first()?->customer_phone,
             'total' => $this->total,
         ]);
 
@@ -204,14 +196,25 @@ class Index extends Component
             Item::find($item['id'])
                 ?->increment('stock', $item['qty']);
         }
+        $this->reset([
+            'receiptNo',
+            'salesItems',
+            'cart',
+            'historyReceipt'
+        ]);
+
+        $this->resetPage();
     }
 
         // RESET BUT KEEP PHONE
+        $this->lastReturnId = $return->id;
+        $this->showReturnSuccess = true;
         $this->cart = [];
-
-        // reload updated data
         $this->loadSales();
-        return redirect()->route('return.receipt', $return->id);
+        $this->dispatch(
+            'returnSuccess',
+            receiptUrl: route('return.receipt', $return->id)
+        );
     }
 
     // LOAD RETURN HISTORY
@@ -221,7 +224,7 @@ class Index extends Component
             ->whereHas('items');
 
         // FILTER RECEIPT
-        if ($this->filterReceipt) {
+        if ($this->historyReceipt) {
 
             $query->whereHas('items', function ($q) {
 
@@ -232,7 +235,7 @@ class Index extends Component
                         $q3->where(
                             'receipt_no',
                             'like',
-                            '%' . $this->filterReceipt . '%'
+                            '%' . $this->historyReceipt . '%'
                         );
 
                     });
@@ -272,5 +275,25 @@ class Index extends Component
             'returnHistory' => $this->loadReturns()
 
         ]);
+    }
+
+    public function clearReceiptSearch()
+    {
+        $this->receiptNo = '';
+        $this->salesItems = [];
+        $this->cart = [];
+        $this->resetPage();
+    }
+
+    public function clearHistorySearch()
+    {
+        $this->historyReceipt = '';
+        $this->resetPage();
+    }
+
+    public function clearDateFilter()
+    {
+        $this->filterDate = '';
+        $this->resetPage();
     }
 }

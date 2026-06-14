@@ -26,7 +26,7 @@ class Index extends Component
     public $totalReturns = 0;
     public $netRevenue = 0;
     public $dailySalesData = [];
-
+    public $period = 'this_month';
     // Item report
     public $selectedItem = null;
     public $itemStock = 0;
@@ -37,8 +37,7 @@ class Index extends Component
 
     public function mount()
     {
-        $this->fromDate = now()->startOfMonth()->toDateString();
-        $this->toDate = now()->endOfMonth()->toDateString();
+        $this->setPeriod();
         $this->loadReport();
     }
 
@@ -215,6 +214,49 @@ class Index extends Component
         return response()->streamDownload(fn() => print($pdf->output()), 'report.pdf');
     }
 
+    public function setPeriod()
+    {
+        switch ($this->period) {
+
+            case 'today':
+                $this->fromDate = now()->toDateString();
+                $this->toDate = now()->toDateString();
+                break;
+
+            case 'yesterday':
+                $this->fromDate = now()->subDay()->toDateString();
+                $this->toDate = now()->subDay()->toDateString();
+                break;
+
+            case 'this_week':
+                $this->fromDate = now()->startOfWeek()->toDateString();
+                $this->toDate = now()->endOfWeek()->toDateString();
+                break;
+
+            case 'this_month':
+                $this->fromDate = now()->startOfMonth()->toDateString();
+                $this->toDate = now()->endOfMonth()->toDateString();
+                break;
+
+            case 'last_month':
+                $this->fromDate = now()->subMonth()->startOfMonth()->toDateString();
+                $this->toDate = now()->subMonth()->endOfMonth()->toDateString();
+                break;
+
+            case 'this_year':
+                $this->fromDate = now()->startOfYear()->toDateString();
+                $this->toDate = now()->endOfYear()->toDateString();
+                break;
+        }
+
+        $this->loadReport();
+    }
+    
+    public function updatedPeriod()
+    {
+        $this->resetPage();
+        $this->setPeriod();
+    }
     public function render()
     {
         return view('livewire.reports.index', [

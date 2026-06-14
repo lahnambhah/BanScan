@@ -16,15 +16,16 @@ use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
 
             {{-- SELECT ALL --}}
             <label class="flex items-center gap-2 text-sm text-gray-600">
-                <input type="checkbox"
-                    id="select-all"
+               <input
+                    type="checkbox"
+                    wire:click="toggleSelectAll"
                     class="rounded border-gray-300 h-6 w-6">
                 Select All
             </label>
 
             {{-- DOWNLOAD SELECTED --}}
             <button
-                onclick="downloadSelected()"
+                wire:click="downloadSelected"
                 class="bg-gray-800 text-white px-4 py-2 rounded text-center flex items-center justify-center gap-2">
                 <x-heroicon-o-arrow-down-tray class="w-4 h-4" />
                 Download Selected
@@ -32,13 +33,42 @@ use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
         </div>
     </div>
 
-    {{-- SEARCH --}}
-    <div class="mb-6">
-        <input
-            type="text"
-            wire:model.live="search"
-            placeholder="Search barcodes..."
-            class="w-full md:w-96 border rounded px-4 py-2 focus:ring-2 focus:ring-blue-500">
+    {{-- SEARCH + FILTER --}}
+    <div class="mb-6 flex items-center gap-3">
+        {{-- SEARCH --}}
+        <div class="relative w-full md:w-96">
+            <input
+                wire:key="search-{{ md5($search) }}"
+                type="text"
+                wire:model.live.debounce.1000ms="search"
+                placeholder="Search barcodes..."
+                class="w-full border rounded px-4 py-2 pr-10 focus:ring-2 focus:ring-blue-500">
+
+            @if($search)
+                <button
+                    type="button"
+                    wire:click="clearSearch"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500">
+                    <x-heroicon-o-x-mark class="w-5 h-5" />
+                </button>
+            @endif
+        </div>
+
+        {{-- CATEGORY FILTER --}}
+        <select
+            wire:model.live="category"
+            class="border rounded px-4 py-2 w-56">
+
+            <option value="">
+                All Categories
+            </option>
+
+            @foreach($categories as $category)
+                <option value="{{ $category->id }}">
+                    {{ $category->name }}
+                </option>
+            @endforeach
+        </select>
     </div>
 
     {{-- GRID --}}
@@ -78,13 +108,19 @@ use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
                 {{-- SELECT --}}
                 <label class="cursor-pointer flex items-center gap-2 group">
 
-                    <input type="checkbox"
-                        class="barcode-checkbox hidden"
-                        value="{{ $item->id }}">
+                    <input
+                        type="checkbox"
+                        wire:model.live="selected"
+                        value="{{ $item->id }}"
+                        class="hidden">
 
                     {{-- CHECKBOX UI --}}
-                    <div class="check-ui w-9 h-9 rounded border border-gray-300 bg-gray-50 flex items-center justify-center transition-all duration-200"> 
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 check-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"> 
+                    <div class="w-9 h-9 rounded flex items-center justify-center transition-all duration-200
+                        {{ in_array($item->id, $selected)
+                            ? 'bg-green-500 border-green-500 scale-110'
+                            : 'border border-gray-300 bg-gray-50' }}">
+                        
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 {{ in_array($item->id, $selected) ? 'text-white' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"> 
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /> 
                         </svg> 
                     </div>
@@ -113,6 +149,9 @@ use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
         </div>
         @endforeach
     </div>    
+    <div class="mt-6">
+    {{ $items->links() }}
+</div>
     @if($items->isEmpty())
         <div class="text-center text-gray-500 mt-12">
             No barcodes found.
@@ -120,118 +159,27 @@ use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
     @endif
 </div>
 
-{{-- SCRIPT --}}
+{{-- BARCODE ERROR --}}
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('barcodeError', event => {
 
-    // UI TOGGLE
-    document.querySelectorAll('.barcode-checkbox').forEach(cb => {
-
-        cb.addEventListener('change', function () {
-
-            const ui = this.parentElement.querySelector('.check-ui');
-            const icon = this.parentElement.querySelector('.check-icon');
-
-            if (this.checked) {
-
-                ui.classList.remove('border-gray-300', 'bg-white');
-
-                ui.classList.add(
-                    'bg-green-500',
-                    'border-green-500',
-                    'scale-110'
-                );
-
-                icon.classList.remove('text-gray-400');
-                icon.classList.add('text-white');
-
-            } else {
-
-                ui.classList.remove(
-                    'bg-green-500',
-                    'border-green-500',
-                    'scale-110'
-                );
-
-                ui.classList.add(
-                    'border-gray-300',
-                    'bg-white'
-                );
-
-                icon.classList.remove('text-white');
-                icon.classList.add('text-gray-400');
-
-            }
-
-        });
-
+    Swal.fire({
+        icon: 'warning',
+        title: 'No Barcode Selected',
+        text: event.detail.message
     });
-
-    // SELECT ALL
-    document.getElementById('select-all')
-        .addEventListener('change', function () {
-
-            document.querySelectorAll('.barcode-checkbox')
-                .forEach(cb => {
-
-                    cb.checked = this.checked;
-                    cb.dispatchEvent(new Event('change'));
-
-                });
-
-        });
 
 });
-
-// DOWNLOAD SELECTED
-function downloadSelected() {
-
-    let items = [];
-
-    document.querySelectorAll('.barcode-checkbox').forEach(cb => {
-
-        if (cb.checked) {
-
-            const card = cb.closest('.bg-white');
-
-            const qtyInput = card.querySelector('.barcode-qty');
-
-            items.push({
-                id: cb.value,
-                qty: qtyInput.value || 1
-            });
-
-        }
-
-    });
-
-    if (items.length === 0) {
-
-        alert('Please select at least one barcode');
-        return;
-
-    }
-
-    const query = encodeURIComponent(JSON.stringify(items));
-
-    window.open(
-        '/barcodes/export?items=' + query,
-        '_blank'
-    );
-
-    // RESET
-    document.querySelectorAll('.barcode-checkbox').forEach(cb => {
-
-        cb.checked = false;
-        cb.dispatchEvent(new Event('change'));
-
-    });
-
-}
 </script>
 
+{{-- OPEN PRINT PAGE --}}
 <script>
 window.addEventListener('openBarcodePrint', event => {
-    window.open(event.detail[0], '_blank');
+
+    const url = event.detail[0];
+
+    window.open(url, '_blank');
+
 });
 </script>
+

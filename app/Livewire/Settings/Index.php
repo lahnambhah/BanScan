@@ -54,7 +54,19 @@ class Index extends Component
         ]);
 
         $user = auth()->user();
+        
+        $hasChanges =
+            $user->name !== $this->name ||
+            $user->email !== $this->email ||
+            (bool)$user->notify_low_stock !== (bool)$this->notify_low_stock ||
+            (bool)$user->notify_sales !== (bool)$this->notify_sales ||
+            (bool)$user->notify_new_items !== (bool)$this->notify_new_items ||
+            (bool)$user->notify_email !== (bool)$this->notify_email;
 
+            if (!$hasChanges) {
+                $this->dispatch('noChanges');
+                return;
+            }
         $emailChanged = $user->email !== $this->email;
 
         $user->name = $this->name;

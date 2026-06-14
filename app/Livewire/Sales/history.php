@@ -49,56 +49,62 @@ class History extends Component
     }
 
     public function render()
-{
-    // Check date range
-    if ($this->startDate && $this->endDate) {
+    {
+        // Check date range
+        if ($this->startDate && $this->endDate) {
 
-        if ($this->startDate > $this->endDate) {
+            if ($this->startDate > $this->endDate) {
 
-            session()->flash(
-                'error',
-                'Start date cannot be greater than end date.'
-            );
+                session()->flash(
+                    'error',
+                    'Start date cannot be greater than end date.'
+                );
 
-            return view('livewire.sales.history', [
-                'sales' => Sale::latest()->paginate(10)
-            ]);
+                return view('livewire.sales.history', [
+                    'sales' => Sale::latest()->paginate(10)
+                ]);
+            }
         }
+
+        $sales = Sale::latest()
+
+            ->when($this->search, function ($query) {
+
+                $query->where('customer_phone', 'like', '%' . $this->search . '%')
+                    ->orWhere('receipt_no', 'like', '%' . $this->search . '%');
+
+            })
+
+            ->when($this->startDate, function ($query) {
+
+                $query->whereDate(
+                    'created_at',
+                    '>=',
+                    $this->startDate
+                );
+
+            })
+
+            ->when($this->endDate, function ($query) {
+
+                $query->whereDate(
+                    'created_at',
+                    '<=',
+                    $this->endDate
+                );
+
+            })
+
+            ->paginate(10);
+
+        return view('livewire.sales.history', [
+            'sales' => $sales
+        ]);
     }
 
-    $sales = Sale::latest()
-
-        ->when($this->search, function ($query) {
-
-            $query->where('customer_phone', 'like', '%' . $this->search . '%')
-                  ->orWhere('receipt_no', 'like', '%' . $this->search . '%');
-
-        })
-
-        ->when($this->startDate, function ($query) {
-
-            $query->whereDate(
-                'created_at',
-                '>=',
-                $this->startDate
-            );
-
-        })
-
-        ->when($this->endDate, function ($query) {
-
-            $query->whereDate(
-                'created_at',
-                '<=',
-                $this->endDate
-            );
-
-        })
-
-        ->paginate(10);
-
-    return view('livewire.sales.history', [
-        'sales' => $sales
-    ]);
-}
+    public function clearSearch()
+    {
+        $this->search = '';
+        $this->resetPage();
+    }
 }

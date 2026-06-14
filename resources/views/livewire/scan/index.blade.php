@@ -211,6 +211,12 @@
                                     <p class="text-xs text-gray-500">
                                         {{ $item['barcode'] }}
                                     </p>
+
+                                    @if(empty($item['manual']))
+                                        <p class="text-xs text-gray-500 mt-1">
+                                            In Stock: {{ \App\Models\Item::find($item['id'])?->stock ?? 0 }}
+                                        </p>
+                                    @endif
                                 </div>
 
                                 {{-- CENTER PRICE --}}
@@ -219,23 +225,21 @@
                                         ₹ {{ $item['price'] }}
                                     </p>
                                     
-                                    <div class="flex items-center justify-center gap-2 mt-1">
-                                        <button
-                                            wire:click="decrease('{{ $code }}')"
-                                            class="px-3 py-1 bg-gray-100 rounded text-base">
-                                            -
-                                        </button>
-
-                                        <span class="text-sm">
-                                            {{ $item['qty'] }}
-                                        </span>
-
-                                        <button
-                                            wire:click="increase('{{ $code }}')"
-                                            class="px-3 py-1 bg-gray-100 rounded text-base">
-                                            +
-                                        </button>
+                                    <div class="flex justify-center mt-2">
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            max="{{ \App\Models\Item::find($item['id'])?->stock ?? 9999 }}"
+                                            value="{{ $item['qty'] }}"
+                                            wire:change="updateQty('{{ $code }}', $event.target.value)"
+                                            class="w-20 border rounded text-center py-1 text-sm">
                                     </div>
+
+                                    <button
+                                        wire:click="remove('{{ $code }}')"
+                                        class="mt-2 text-red-600 hover:text-red-800 text-sm underline">
+                                        Remove
+                                    </button>
                                 </div>
                             </div>
                         @endforeach
@@ -493,6 +497,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
             scannerStarted = false;
         }
+
+    });
+
+});
+</script>
+
+{{-- STOCK EXCEEDED --}}
+<script>
+document.addEventListener('livewire:init', () => {
+
+    Livewire.on('stockExceeded', (event) => {
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'Stock Limit Reached',
+            text: `${event[0].item} only has ${event[0].stock} item(s) available in stock.`,
+            confirmButtonText: 'OK'
+        });
 
     });
 

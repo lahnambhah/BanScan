@@ -5,6 +5,7 @@ namespace App\Livewire\Items;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use App\Models\Item;
 
 #[Layout('layouts.app')]
@@ -36,13 +37,18 @@ class Index extends Component
         ]);
     }
 
-    public function delete($id)
+    #[On('deleteItem')]
+    public function deleteItem($id)
     {
         $item = Item::findOrFail($id);
+
         $item->delete();
 
-        $this->dispatch('$refresh');
-        session()->flash('success', 'Item deleted successfully');
+        $this->dispatch(
+            'itemDeleted',
+            message: 'Item deleted successfully.'
+        );
+
         $this->resetPage();
     }
 
@@ -54,5 +60,10 @@ class Index extends Component
     public function updatingStatus()
     {
         $this->resetPage();
+    }
+
+    public function clearSearch()
+    {
+        $this->search = '';
     }
 }

@@ -15,12 +15,25 @@ use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
             <x-heroicon-o-plus class="w-4 h-4" />Add Item</a>
     </div>
 
+    {{-- SEARCH AND FILTERS --}}
     <div class="flex flex-col md:flex-row items-stretch md:items-center gap-4 mb-6">
-        <input
-        type="text"
-        wire:model.live="search"
-        placeholder="Search items..."
-        class="w-full md:w-96 border rounded px-4 py-2 focus:ring-2 focus:ring-blue-500">
+        <div class="relative w-full md:w-96">
+            <input
+                wire:key="search-{{ md5($search) }}"
+                type="text"
+                wire:model.live.debounce.1000ms="search"
+                placeholder="Search items..."
+                class="w-full border rounded px-4 py-2 pr-10 focus:ring-2 focus:ring-blue-500">
+
+            @if($search)
+                <button
+                    type="button"
+                    wire:click="clearSearch"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500">
+                    <x-heroicon-o-x-mark class="w-5 h-5" />
+                </button>
+            @endif
+        </div>
 
         <select
             wire:model.live="status"
@@ -145,9 +158,8 @@ use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
                                 </a>
 
                                 <button
-                                onclick="confirm('Delete this item?') || event.stopImmediatePropagation()"
-                                wire:click="delete({{ $item->id }})"
-                                class="text-gray-400 hover:text-red-500">
+                                    onclick="confirmDeleteItem({{ $item->id }})"
+                                    class="text-gray-400 hover:text-red-500">
                                     <x-heroicon-o-trash class="w-5 h-5" />
                                 </button>
                             </div>
@@ -264,10 +276,8 @@ use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
                 </a>
 
                 <button
-                    onclick="confirm('Delete this item?') || event.stopImmediatePropagation()"
-                    wire:click="delete({{ $item->id }})"
+                    onclick="confirmDeleteItem({{ $item->id }})"
                     class="text-gray-400 hover:text-red-500">
-
                     <x-heroicon-o-trash class="w-5 h-5" />
                 </button>
             </div>
@@ -275,4 +285,41 @@ use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
         @endforeach
     </div>
 
+    <script>
+        function confirmDeleteItem(id) {
+
+            Swal.fire({
+                title: 'Delete Item?',
+                text: 'This action cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, Delete',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+                    Livewire.dispatch('deleteItem', {
+                        id: id
+                    });
+
+                }
+
+            });
+        }
+
+        window.addEventListener('itemDeleted', event => {
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Deleted',
+                text: event.detail.message,
+                timer: 2000,
+                showConfirmButton: false
+            });
+
+        });
+    </script>
 </div>

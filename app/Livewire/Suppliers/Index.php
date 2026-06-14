@@ -4,6 +4,7 @@ namespace App\Livewire\Suppliers;
 
 use Livewire\Component;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use App\Models\Supplier;
 
 #[Layout('layouts.app')]
@@ -12,11 +13,29 @@ class Index extends Component
 {
     public $search = '';
 
-    public function delete($id)
+    #[On('deleteSupplier')]
+    public function deleteSupplier($id)
     {
-        Supplier::find($id)->delete();
-        session()->flash('success', 'Supplier deleted successfully');
-        return redirect('/suppliers');
+        $supplier = Supplier::withCount('items')->findOrFail($id);
+
+        if ($supplier->items_count > 0) {
+
+            $this->dispatch(
+                'supplierDeleteError',
+                message: 'Cannot delete this supplier because it is assigned to '
+                    . $supplier->items_count
+                    . ' item(s).'
+            );
+
+            return;
+        }
+
+        $supplier->delete();
+
+        $this->dispatch(
+            'supplierDeleted',
+            message: 'Supplier deleted successfully.'
+        );
     }
 
     public function render()
@@ -33,5 +52,10 @@ class Index extends Component
         return view('livewire.suppliers.index', [
             'suppliers' => $suppliers
         ]);
+    }
+
+    public function clearSearch()
+    {
+        $this->search = '';
     }
 }

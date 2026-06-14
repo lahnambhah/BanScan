@@ -45,10 +45,16 @@
 
             <button
                 wire:click="update"
-                class="bg-gray-800 text-white px-6 py-2 rounded hover:bg-gray-900 transition w-full sm:w-auto">
-                Update Category
-            </button>
+                wire:loading.attr="disabled"
+                class="bg-gray-800 text-white px-6 py-2 rounded">
+                <span wire:loading.remove wire:target="update">
+                    Update Category
+                </span>
 
+                <span wire:loading wire:target="update">
+                    Saving...
+                </span>
+            </button>
         </div>
 
     </div>

@@ -22,41 +22,46 @@ use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
     {{-- CATEGORY + SUPPLIER --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-        <div>
+        <div wire:ignore>
             <label class="block mb-1 font-medium">Category *</label>
 
-            <select wire:model="category_id"
-                class="w-full border rounded-xl px-4 py-2">
-
-                <option value="">Select</option>
-
+            <select
+                id="categorySelect"
+                class="w-full border">
+                <option value="">Select Category</option>
                 @foreach($categories as $category)
-                    <option value="{{ $category->id }}">
+                    <option
+                        value="{{ $category->id }}"
+                        @selected($category_id == $category->id)>
                         {{ $category->name }}
                     </option>
                 @endforeach
-
             </select>
-            @error('category_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror    
         </div>
+        @error('category_id')
+            <span class="text-red-500 text-sm">{{ $message }}</span>
+        @enderror
 
-        <div>
+        <div wire:ignore>
             <label class="block mb-1 font-medium">Supplier *</label>
 
-            <select wire:model="supplier_id"
-                class="w-full border rounded-xl px-4 py-2">
-
-                <option value="">Select</option>
-
+            <select
+                id="supplierSelect"
+                class="w-full">
+                <option value="">Select Supplier</option>
                 @foreach($suppliers as $supplier)
-                    <option value="{{ $supplier->id }}">
+                    <option
+                        value="{{ $supplier->id }}"
+                        @selected($supplier_id == $supplier->id)>
                         {{ $supplier->name }}
                     </option>
                 @endforeach
-
             </select>
-            @error('supplier_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror        
         </div>
+
+        @error('supplier_id')
+            <span class="text-red-500 text-sm">{{ $message }}</span>
+        @enderror
     </div>
 
     {{-- BARCODE SECTION --}}
@@ -245,11 +250,16 @@ use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
 
         <button
             wire:click="save"
+            wire:loading.attr="disabled"
             class="bg-gray-800 text-white px-6 py-2 rounded hover:bg-gray-700 w-full sm:w-auto">
 
-            Save Item
+            <span wire:loading.remove wire:target="save">
+                Save Item   
+            </span>
+            <span wire:loading wire:target="save">
+                Saving...
+            </span>
         </button>
-
     </div>
 
 </div>
@@ -366,4 +376,31 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+<script>
+document.addEventListener('livewire:init', () => {
+
+    if (document.getElementById('categorySelect')) {
+
+        new TomSelect('#categorySelect', {
+
+            onChange: function(value) {
+                @this.set('category_id', value);
+            }
+
+        });
+    }
+
+    if (document.getElementById('supplierSelect')) {
+
+        new TomSelect('#supplierSelect', {
+
+            onChange: function(value) {
+                @this.set('supplier_id', value);
+            }
+
+        });
+    }
+
+});
+</script>
 </div>
