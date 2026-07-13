@@ -21,7 +21,7 @@ class Create extends Component
         $this->validate([
 
             'name' => 'required|min:2',
-            'email' => 'email|regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/|unique:suppliers,email',
+            'email' => 'nullable|email|regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/|unique:suppliers,email',
             'phone' => 'required|numeric|digits:10|unique:suppliers,phone',
         ], [
 
@@ -30,7 +30,6 @@ class Create extends Component
             'name.min' => 'Supplier name must be at least 2 characters.',
 
             // EMAIL
-            'email' => 'Email must be a valid email address.',
             'email.email' => 'Enter a valid email address.',
             'email.regex' => 'Only Gmail addresses are allowed (example@gmail.com).',
             'email.unique' => 'This email already exists.',

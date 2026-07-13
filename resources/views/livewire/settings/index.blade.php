@@ -220,7 +220,6 @@
                         ['label' => 'Low Stock Alerts', 'desc' => 'Get notified when product stock runs low', 'model' => 'notify_low_stock'],
                         ['label' => 'Sales Updates', 'desc' => 'Daily summary of sales activity', 'model' => 'notify_sales'],
                         ['label' => 'New Items', 'desc' => 'When new products are added to inventory', 'model' => 'notify_new_items'],
-                        ['label' => 'Email Notifications', 'desc' => 'Receive all notifications via email', 'model' => 'notify_email'],
                     ];
                 @endphp
                 @foreach($toggles as $toggle)
